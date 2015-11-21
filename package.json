@@ -1,11 +1,11 @@
 {
-	"name": "mock-debug",
-	"displayName": "Mock Debug",
+	"name": "php-debug",
+	"displayName": "PHP Debug (xDebug)",
 	"version": "0.10.18",
-	"publisher": "andreweinand",
-	"description": "Starter extension for developing debug adapters for VS Code.",
+	"publisher": "cmpaul",
+	"description": "PHP xDebug extension for VS Code.",
 	"author": {
-		"name": "Microsoft Corporation"
+		"name": "Chris Paul"
 	},
 	"engines": {
 		"vscode": "^0.10.1"
@@ -18,7 +18,7 @@
 	"dependencies": {},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/Microsoft/vscode-mock-debug.git"
+		"url": "https://github.com/cmpaul/vscode-php-debug.git"
 	},
 	"devDependencies": {
 		"gulp": "^3.9.0",
@@ -30,12 +30,12 @@
 	"contributes": {
 		"debuggers": [
 			{
-				"type": "mock",
-				"label": "Mock Debug",
+				"type": "php",
+				"label": "PHP Debug (xDebug)",
 
-				"enableBreakpointsFor": { "languageIds": [ "markdown" ] },
+				"enableBreakpointsFor": { "languageIds": [ "php" ] },
 
-				"program": "./out/mock/mockDebug.js",
+				"program": "./out/php/phpDebug.js",
 				"runtime": "node",
 
 				"configurationAttributes": {
@@ -44,8 +44,8 @@
 						"properties": {
 							"program": {
 								"type": "string",
-								"description": "Workspace relative path to a text file.",
-								"default": "readme.md"
+								"description": "Workspace relative path to a PHP file.",
+								"default": "test.php"
 							},
 							"stopOnEntry": {
 								"type": "boolean",
@@ -58,10 +58,10 @@
 
 				"initialConfigurations": [
 					{
-						"name": "Mock-Debug",
-						"type": "mock",
+						"name": "PHP-Debug",
+						"type": "php",
 						"request": "launch",
-						"program": "readme.md",
+						"program": "test.php",
 						"stopOnEntry": true
 					}
 				]
