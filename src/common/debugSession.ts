@@ -2,7 +2,7 @@
  * Copyright (C) Microsoft Corporation. All rights reserved.
  *--------------------------------------------------------*/
 
-import {V8Protocol, Response, Event} from './v8Protocol';
+import {DBGProtocol, Response, Event} from './dbgProtocol';
 import * as Net from 'net';
 import * as Path from 'path';
 import * as Url from 'url';
@@ -135,7 +135,7 @@ export enum ErrorDestination {
 	Telemetry = 2
 };
 
-export class DebugSession extends V8Protocol {
+export class DebugSession extends DBGProtocol {
 
 	private _debuggerLinesStartAt1: boolean;
 	private _debuggerColumnsStartAt1: boolean;
@@ -185,7 +185,7 @@ export class DebugSession extends V8Protocol {
 
 		if (port > 0) {
 			// start as a server
-			console.error(`waiting for v8 protocol on port ${port}`);
+			console.error(`waiting for DBG protocol on port ${port}`);
 			Net.createServer((socket) => {
 				console.error('>> accepted connection from client');
 				socket.on('end', () => {

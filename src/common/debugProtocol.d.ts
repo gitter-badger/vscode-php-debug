@@ -6,10 +6,10 @@
  */
 declare module DebugProtocol {
 
-	//---- V8 inspired protocol
+	//---- DBG inspired protocol
 
-	/** Base class of V8 requests, responses, and events. */
-	export interface V8Message {
+	/** Base class of DBG requests, responses, and events. */
+	export interface DBGMessage {
 		/** Sequence number */
 		seq: number;
 		/** One of "request", "response", or "event" */
@@ -17,7 +17,7 @@ declare module DebugProtocol {
 	}
 
 	/** Client-initiated request */
-	export interface Request extends V8Message {
+	export interface Request extends DBGMessage {
 		/** The command to execute */
 		command: string;
 		/** Object containing arguments for the command */
@@ -25,7 +25,7 @@ declare module DebugProtocol {
 	}
 
 	/** Server-initiated event */
-	export interface Event extends V8Message {
+	export interface Event extends DBGMessage {
 		/** Type of event */
 		event: string;
 		/** Event-specific information */
@@ -33,7 +33,7 @@ declare module DebugProtocol {
 	}
 
 	/** Server-initiated response to client request */
-	export interface Response extends V8Message {
+	export interface Response extends DBGMessage {
 		/** Sequence number of the corresponding request */
 		request_seq: number;
 		/** Outcome of the request */

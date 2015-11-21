@@ -4,7 +4,7 @@
 
 import * as ee from 'events';
 
-export class Message implements DebugProtocol.V8Message {
+export class Message implements DebugProtocol.DBGMessage {
 	seq: number;
 	type: string;
 
@@ -44,17 +44,16 @@ export class Event extends Message implements DebugProtocol.Event {
 	}
 }
 
-export class V8Protocol extends ee.EventEmitter {
+export class DBGProtocol extends ee.EventEmitter {
 
 	private static TIMEOUT = 3000;
 
-	private _state: string;
 	private _contentLength: number;
 	private _bodyStartByteIndex: number;
 	private _res: any;
 	private _sequence: number;
 	private _writableStream: NodeJS.WritableStream;
-	private _pendingRequests = new Map<number, DebugProtocol.Response>();
+private _pendingRequests = new Map<number, DebugProtocol.Response>();
 
 	constructor() {
 		super();
@@ -88,7 +87,7 @@ export class V8Protocol extends ee.EventEmitter {
 		}
 	}
 
-	protected send(command: string, args: any, timeout: number = V8Protocol.TIMEOUT): Promise<DebugProtocol.Response> {
+	protected send(command: string, args: any, timeout: number = DBGProtocol.TIMEOUT): Promise<DebugProtocol.Response> {
 		return new Promise((completeDispatch, errorDispatch) => {
 			this._sendRequest(command, args, timeout, (result: DebugProtocol.Response) => {
 				if (result.success) {
@@ -150,13 +149,9 @@ export class V8Protocol extends ee.EventEmitter {
 		this.emit(event.event, event);
 	}
 
-	private _send(typ: string, message: DebugProtocol.V8Message): void {
-		message.type = typ;
-		message.seq = this._sequence++;
-		const json = JSON.stringify(message);
-		const data = 'Content-Length: ' + Buffer.byteLength(json, 'utf8') + '\r\n\r\n' + json;
-		if (this._writableStream) {
-			this._writableStream.write(data);
+	private _send(typ: string, message: string): void {
+		if (message && this._writableStream) {
+			this._writableStream.write(message);
 		}
 	}
 
@@ -165,58 +160,41 @@ export class V8Protocol extends ee.EventEmitter {
 			raw: raw || '',
 			headers: {}
 		};
-		this._state = 'headers';
-		this._handleData('');
 	}
 
 	private _handleData(d): void {
+		var self = this;
 		const res = this._res;
 		res.raw += d;
-
-		switch (this._state) {
-			case 'headers':
-				const endHeaderIndex = res.raw.indexOf('\r\n\r\n');
-				if (endHeaderIndex < 0)
-					break;
-
-				const rawHeader = res.raw.slice(0, endHeaderIndex);
-				const endHeaderByteIndex = Buffer.byteLength(rawHeader, 'utf8');
-				const lines = rawHeader.split('\r\n');
-				for (let i = 0; i < lines.length; i++) {
-					const kv = lines[i].split(/: +/);
-					res.headers[kv[0]] = kv[1];
+		var parseString = require('xml2js').parseString;
+		var xml = d.replace(/^[^<]+/, ''); // strip unwanted chars
+		parseString(xml, function(err, result) {
+			if (err !== null) {
+				console.log(err);
+			}
+			if (result === null) {
+				// Nothing to do
+                return;
+            }
+			Object.keys(result).forEach(function(key) {
+				switch (key) {
+					case 'init':
+						console.dir(result);
+						// Respond to init
+						/*
+						self._dispatch(res.body);
+						self._newRes(buf.slice(self._bodyStartByteIndex + self._contentLength).toString('utf8'));
+						*/
+						break;
+					default:
+						// do nothing
+						break;
 				}
-
-				this._contentLength = +res.headers['Content-Length'];
-				this._bodyStartByteIndex = endHeaderByteIndex + 4;
-
-				this._state = 'body';
-
-				const len = Buffer.byteLength(res.raw, 'utf8');
-				if (len - this._bodyStartByteIndex < this._contentLength) {
-					break;
-				}
-			// pass thru
-
-			case 'body':
-				const resRawByteLength = Buffer.byteLength(res.raw, 'utf8');
-				if (resRawByteLength - this._bodyStartByteIndex >= this._contentLength) {
-					const buf = new Buffer(resRawByteLength);
-					buf.write(res.raw, 0, resRawByteLength, 'utf8');
-					res.body = buf.slice(this._bodyStartByteIndex, this._bodyStartByteIndex + this._contentLength).toString('utf8');
-					res.body = res.body.length ? JSON.parse(res.body) : {};
-					this._dispatch(res.body);
-					this._newRes(buf.slice(this._bodyStartByteIndex + this._contentLength).toString('utf8'));
-				}
-				break;
-
-			default:
-				throw new Error('Unknown state');
-				break;
-		}
+			});
+		});
 	}
 
-	private _dispatch(message: DebugProtocol.V8Message): void {
+	private _dispatch(message: DebugProtocol.DBGMessage): void {
 		switch (message.type) {
 		case 'event':
 			this._emitEvent(<DebugProtocol.Event> message);
