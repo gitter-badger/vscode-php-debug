@@ -9,7 +9,7 @@ import {basename} from 'path';
 
 
 /**
- * This interface should always match the schema found in the mock-debug extension manifest.
+ * This interface should always match the schema found in the extension manifest.
  */
 export interface LaunchRequestArguments {
 	/** An absolute path to the program to debug. */
@@ -18,7 +18,7 @@ export interface LaunchRequestArguments {
 	stopOnEntry?: boolean;
 }
 
-class MockDebugSession extends DebugSession {
+class PHPDebugSession extends DebugSession {
 
 	// we don't support multiple threads, so we can use a hardcoded ID for the default thread
 	private static THREAD_ID = 1;
@@ -63,10 +63,10 @@ class MockDebugSession extends DebugSession {
 			this.sendResponse(response);
 
 			// we stop on the first line
-			this.sendEvent(new StoppedEvent("entry", MockDebugSession.THREAD_ID));
+			this.sendEvent(new StoppedEvent("entry", PHPDebugSession.THREAD_ID));
 		} else {
 			// we just start to run until we hit a breakpoint or an exception
-			this.continueRequest(response, { threadId: MockDebugSession.THREAD_ID });
+			this.continueRequest(response, { threadId: PHPDebugSession.THREAD_ID });
 		}
 	}
 
@@ -111,7 +111,7 @@ class MockDebugSession extends DebugSession {
 		// return the default thread
 		response.body = {
 			threads: [
-				new Thread(MockDebugSession.THREAD_ID, "thread 1")
+				new Thread(PHPDebugSession.THREAD_ID, "thread 1")
 			]
 		};
 		this.sendResponse(response);
@@ -188,14 +188,14 @@ class MockDebugSession extends DebugSession {
 			if (lines && lines.indexOf(ln) >= 0) {
 				this._currentLine = ln;
 				this.sendResponse(response);
-				this.sendEvent(new StoppedEvent("step", MockDebugSession.THREAD_ID));
+				this.sendEvent(new StoppedEvent("step", PHPDebugSession.THREAD_ID));
 				return;
 			}
 			// if word 'exception' found in source -> throw exception
 			if (this._sourceLines[ln].indexOf("exception") >= 0) {
 				this._currentLine = ln;
 				this.sendResponse(response);
-				this.sendEvent(new StoppedEvent("exception", MockDebugSession.THREAD_ID));
+				this.sendEvent(new StoppedEvent("exception", PHPDebugSession.THREAD_ID));
 				this.sendEvent(new OutputEvent(`exception in line: ${ln}\n`, 'stderr'));
 				return;
 			}
@@ -211,7 +211,7 @@ class MockDebugSession extends DebugSession {
 			if (this._sourceLines[ln].trim().length > 0) {   // find next non-empty line
 				this._currentLine = ln;
 				this.sendResponse(response);
-				this.sendEvent(new StoppedEvent("step", MockDebugSession.THREAD_ID));
+				this.sendEvent(new StoppedEvent("step", PHPDebugSession.THREAD_ID));
 				return;
 			}
 		}
@@ -229,4 +229,4 @@ class MockDebugSession extends DebugSession {
 	}
 }
 
-DebugSession.run(MockDebugSession);
+DebugSession.run(PHPDebugSession);
