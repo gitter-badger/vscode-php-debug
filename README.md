@@ -16,3 +16,7 @@ Once the `out/` directory is generated, I can debug the extension and trigger th
 For more information, see:
 - https://code.visualstudio.com/docs/extensions/example-debuggers
 - https://code.visualstudio.com/docs/extensionAPI/api-debugging
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/cmpaul/vscode-php-debug/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
