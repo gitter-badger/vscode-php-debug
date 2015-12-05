@@ -1,4 +1,6 @@
 # vscode-php-debug
+
+[![Join the chat at https://gitter.im/cmpaul/vscode-php-debug](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/cmpaul/vscode-php-debug?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 A debug extension to add xDebug support to Visual Studio Code
 
 ## NOTE
